@@ -24,7 +24,7 @@ function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
 
         // Reviewer for file cant be the same as the pull request sender
         if (match && (usernames.indexOf(pullRequestUser) === -1 || usernames.length > 1)) {
-          return _.without(usernames, pullRequestUser);
+          return _.without(usernames, pullRequestUser).length > 0;
         }
       });
 
