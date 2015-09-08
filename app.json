@@ -9,7 +9,7 @@
     }
   },
   "addons": [
-    "rediscould"
+    "rediscloud"
   ],
   "image": "heroku/go:1.5"
 }
