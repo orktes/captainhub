@@ -54,7 +54,11 @@ func payload(c *echo.Context) error {
 		return err
 	}
 
+	fmt.Printf("Event: %s, Owner: %s, Repo %s\n", eventType, owner, org)
+
 	cfg, err := getCaptainConfig(owner, repo)
+
+	fmt.Printf("%s/%s config: %+v\n", owner, org, cfg)
 
 	if err != nil {
 		return err
