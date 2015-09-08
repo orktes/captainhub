@@ -170,6 +170,9 @@ function pullRequestComment(eventData) {
           return !!cdm;
         }
       );
+
+      console.log('cdm ' + cmd.join(' '));
+
       switch(cmd[0].toLowerCase()) {
         case 'ok':
           var strData = loadData(id + ':waiting_review_from');
