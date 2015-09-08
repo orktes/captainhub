@@ -6,14 +6,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/garyburd/redigo/redis"
-	"github.com/google/go-github/github"
-	"github.com/labstack/echo"
-	mw "github.com/labstack/echo/middleware"
-	"github.com/robertkrimen/otto"
-	"golang.org/x/oauth2"
+	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/garyburd/redigo/redis"
+	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/google/go-github/github"
+	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/labstack/echo"
+	mw "github.com/orktes/captainhub/Godeps/_workspace/src/github.com/labstack/echo/middleware"
+	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/robertkrimen/otto"
+	"github.com/orktes/captainhub/Godeps/_workspace/src/golang.org/x/oauth2"
 
-	_ "github.com/robertkrimen/otto/underscore"
+	_ "github.com/orktes/captainhub/Godeps/_workspace/src/github.com/robertkrimen/otto/underscore"
 )
 
 //go:generate go-bindata -prefix=plugins/ -pkg=main plugins/...

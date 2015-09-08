@@ -1,6 +1,6 @@
 package main
 
-import "github.com/google/go-github/github"
+import "github.com/orktes/captainhub/Godeps/_workspace/src/github.com/google/go-github/github"
 
 func createPullRequestComment(owner string, repo string, prNumber int, body string) (err error) {
 	client := getGithubClient()

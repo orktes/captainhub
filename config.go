@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 
-	"github.com/google/go-github/github"
+	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/google/go-github/github"
 )
 
 type captainConfigPlugin struct {
