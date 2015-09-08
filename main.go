@@ -236,7 +236,7 @@ func payload(c *echo.Context) error {
 func main() {
 	// Init redis client
 	var err error
-	redisClient, err = redis.Dial("tcp", os.Getenv("REDISCLOUD_URL"))
+	redisClient, err = redis.DialURL(os.Getenv("REDISCLOUD_URL"))
 	defer redisClient.Close()
 
 	if err != nil {
