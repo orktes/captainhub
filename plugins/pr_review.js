@@ -212,8 +212,10 @@ function pullRequestComment(eventData) {
                 var reviewerFiles = JSON.parse(strData);
 
                 if (cmd[2]) {
-                  newFiles = _.filter(getPullRequestFiles(id), function (file) {
+                  newFiles = _map(_.filter(getPullRequestFiles(id), function (file) {
                     return matchFilePath(cmd[2], file.filename);
+                  }), function (file) {
+                    return file.filename;
                   });
                 }
 
