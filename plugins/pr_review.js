@@ -34,7 +34,7 @@ function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
         return;
       }
 
-      reviewers = pattern.reviewers;
+      reviewers = _.without(pattern.reviewers, pullRequestUser);
 
       var alreadyReviewing = _.intersection(
         reviewers,
