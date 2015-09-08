@@ -11,5 +11,5 @@
   "addons": [
     "rediscould"
   ],
-  "image": "heroku/go:1.5",
+  "image": "heroku/go:1.5"
 }
