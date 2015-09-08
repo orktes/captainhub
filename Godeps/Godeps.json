@@ -1,0 +1,56 @@
+{
+	"ImportPath": "github.com/orktes/captainhub",
+	"GoVersion": "go1.5",
+	"Deps": [
+		{
+			"ImportPath": "github.com/bradfitz/http2",
+			"Rev": "f8202bc903bda493ebba4aa54922d78430c2c42f"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "d8dbe4d94f15fe89232e0402c6e8a0ddf21af3ab"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "d8dbe4d94f15fe89232e0402c6e8a0ddf21af3ab"
+		},
+		{
+			"ImportPath": "github.com/google/go-github/github",
+			"Rev": "7277108aa3e8823e0e028f6c74aea2f4ce4a1b5a"
+		},
+		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "547ef5ac979778feb2f760cdb5f4eae1a2207b86"
+		},
+		{
+			"ImportPath": "github.com/labstack/echo",
+			"Comment": "v0.0.16-13-gaab17b9",
+			"Rev": "aab17b9f69b7d27d488d9431dd8bb22509fe271a"
+		},
+		{
+			"ImportPath": "github.com/labstack/gommon/color",
+			"Comment": "v0.0.3-5-g3dc2d67",
+			"Rev": "3dc2d67251832fa0da35728aada6a9c377cb2442"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-colorable",
+			"Rev": "d67e0b7d1797975196499f79bcc322c08b9f218b"
+		},
+		{
+			"ImportPath": "github.com/robertkrimen/otto",
+			"Rev": "47082f430885e505c18bbedc3e2b336a968a50dd"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "a74a0672349d0bb67e7d25f8e88944019c98a73b"
+		},
+		{
+			"ImportPath": "golang.org/x/net/websocket",
+			"Rev": "a74a0672349d0bb67e7d25f8e88944019c98a73b"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "8914e5017ca260f2a3a1575b1e6868874050d95e"
+		}
+	]
+}

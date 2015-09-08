@@ -1,0 +1,15 @@
+{
+  "name": "Captainhub",
+  "description": "Github Hook server (code review etc)",
+  "repository": "https://github.com/orktes/captainhub",
+  "keywords": ["github", "review", "golang", "github-hooks"],
+  "env": {
+    "GITHUB_ACCESS_TOKEN": {
+      "description": "Github access token"
+    }
+  },
+  "addons": [
+    "rediscloud"
+  ],
+  "image": "heroku/go:1.5"
+}
