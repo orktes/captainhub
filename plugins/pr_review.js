@@ -167,7 +167,9 @@ function pullRequestComment(eventData) {
   _.each(body.split('\n'), function (message) {
     if (message.indexOf('pr_review') === 0) {
       cmd = _.filter(
-        _.map(message.substring(10).split(' '), function (part) { return part.trim(); }),
+        _.map(message.substring(10).split(' '), function (part) {
+          return part.trim().replace(/^@/, '');
+        }),
         function (cmd) {
           return !!cmd;
         }
