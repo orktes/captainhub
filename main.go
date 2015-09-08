@@ -237,11 +237,10 @@ func main() {
 	// Init redis client
 	var err error
 	redisClient, err = redis.DialURL(os.Getenv("REDISCLOUD_URL"))
-	defer redisClient.Close()
-
 	if err != nil {
 		panic(err)
 	}
+	defer redisClient.Close()
 
 	// Echo instance
 	e := echo.New()
