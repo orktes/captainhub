@@ -256,6 +256,10 @@ function pullRequestComment(eventData) {
             }
           }
         break;
+        case 'reopen':
+        var fakeEvent = {number: id, pull_request: getPullRequestDetails(id)};
+        pullRequestOpened(fakeEvent);
+        break;
         case 'status':
           var strData = loadData(id + ':waiting_review_from');
           if (strData) {
