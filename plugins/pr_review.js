@@ -167,7 +167,7 @@ function pullRequestComment(eventData) {
       cmd = _.filter(
         _.map(message.substring(10).split(' '), function (part) { return part.trim(); }),
         function (cmd) {
-          return !!cdm;
+          return !!cmd;
         }
       );
 
