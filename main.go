@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/garyburd/redigo/redis"
 	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/google/go-github/github"
 	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/labstack/echo"
 	mw "github.com/orktes/captainhub/Godeps/_workspace/src/github.com/labstack/echo/middleware"
 	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/robertkrimen/otto"
+	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/ryanuber/go-glob"
 	"github.com/orktes/captainhub/Godeps/_workspace/src/golang.org/x/oauth2"
 
 	_ "github.com/orktes/captainhub/Godeps/_workspace/src/github.com/robertkrimen/otto/underscore"
@@ -24,7 +24,7 @@ func matchFilePath(call otto.FunctionCall) otto.Value {
 	pattern := call.Argument(0).String()
 	name := call.Argument(1).String()
 
-	match, _ := filepath.Match(pattern, name)
+	match := glob.Glob(pattern, name)
 	val, _ := otto.ToValue(match)
 	return val
 }

@@ -41,6 +41,10 @@
 			"Rev": "47082f430885e505c18bbedc3e2b336a968a50dd"
 		},
 		{
+			"ImportPath": "github.com/ryanuber/go-glob",
+			"Rev": "0067a9abd927e50aed5190662702f81231413ae0"
+		},
+		{
 			"ImportPath": "golang.org/x/net/context",
 			"Rev": "a74a0672349d0bb67e7d25f8e88944019c98a73b"
 		},
