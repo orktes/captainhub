@@ -5,8 +5,7 @@
   "keywords": ["github", "review", "golang", "github-hooks"],
   "env": {
     "GITHUB_ACCESS_TOKEN": {
-      "description": "Github access token",
-      "generator": "secret"
+      "description": "Github access token"
     }
   },
   "addons": [
