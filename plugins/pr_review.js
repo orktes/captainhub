@@ -77,7 +77,7 @@ function pullRequestOpened(eventData) {
     _.each(reviewerFiles, function (files, reviewer) {
       message += '@' + reviewer + '\n';
       _.each(files, function (file) {
-        message += '- ' + file + '\n';
+        message += '- `' + file + '`\n';
       });
       message += '\n';
     });
@@ -133,7 +133,7 @@ function pullRequestUpdated(eventData) {
     _.each(reviewerFiles, function (files, reviewer) {
       message += '@' + reviewer + '\n';
       _.each(files, function (file) {
-        message += '- ' + file + '\n';
+        message += '- `' + file + '`\n';
       });
       message += '\n';
     });
