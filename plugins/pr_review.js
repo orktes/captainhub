@@ -1,4 +1,6 @@
 function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
+  console.log('Finding reviewers but ignoring ' + pullRequestUser);
+
   var reviewerFiles = {};
   var fileReviewers = {};
 
