@@ -186,7 +186,7 @@ function pullRequestComment(eventData) {
 
               var prDetails = getPullRequestDetails(id);
               if (_.keys(reviewerFiles).length === 0) {
-                createStatus(prDetails.head.sha, 'success', prDetails.url, 'Pull request review', 'pr_review');
+                createStatus(prDetails.head.sha, 'success', prDetails.url, 'Pull request review done', 'pr_review');
                 createIssueComment(id, "Review completed!");
               } else {
                 createStatus(
@@ -283,7 +283,7 @@ function pullRequestComment(eventData) {
 
               if (_.keys(reviewerFiles).length === 0) {
                 var prDetails = getPullRequestDetails(id);
-                createStatus(prDetails.head.sha, 'success', prDetails.url, 'Pull request review', 'pr_review');
+                createStatus(prDetails.head.sha, 'success', prDetails.url, 'Pull request review done', 'pr_review');
                 createIssueComment(id, "Review completed!");
               } else {
                 createStatus(
