@@ -84,7 +84,7 @@ function pullRequestOpened(eventData) {
 
     message += '\n### Review commands\n';
     message += '- accept: `pr_review OK`\n';
-    message += '- add reviewer: `pr_review add [username]`\n';
+    message += '- add reviewer: `pr_review add [username] [pattern]`\n';
     message += '- change reviewer: `pr_review change [old_username] [new_username]`\n';
     message += '- print status: `pr_review status`\n';
 
@@ -217,16 +217,15 @@ function pullRequestComment(eventData) {
 
                 reviewerFiles[cmd[1]] = _.union(reviewerFiles[cmd[1]] || [], newFiles);
                 saveData(id + ':waiting_review_from', JSON.stringify(reviewerFiles));
-                if (_.keys(reviewerFiles).length > 0) {
-                  var prDetails = getPullRequestDetails(id);
-                  createStatus(
-                    prDetails.head.sha,
-                    'pending',
-                    prDetails.url,
-                    'Pull request review: ' + _.keys(reviewerFiles).join(', '),
-                    'pr_review'
-                  );
-                }
+                var prDetails = getPullRequestDetails(id);
+                createStatus(
+                  prDetails.head.sha,
+                  'pending',
+                  prDetails.url,
+                  'Pull request review: ' + _.keys(reviewerFiles).join(', '),
+                  'pr_review'
+                );
+                createIssueComment(id, '@' + cmd[1] + ' added');
               } catch(e) {}
             }
           }
@@ -256,6 +255,7 @@ function pullRequestComment(eventData) {
                   reviewerFiles[cmd[2]] = _.union(reviewerFiles[cmd[2]] || [], reviewerFiles[cmd[1]]);
                   delete reviewerFiles[cmd[1]];
                   saveData(id + ':waiting_review_from', JSON.stringify(reviewerFiles));
+                  createIssueComment(id, '@' + cmd[1] + ' changed to @' + cmd[2]);
                 }
               } catch(e) {}
             }
