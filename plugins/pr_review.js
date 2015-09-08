@@ -171,7 +171,7 @@ function pullRequestComment(eventData) {
         }
       );
 
-      console.log('cdm ' + cmd.join(' '));
+      console.log('cmd ' + cmd.join(' '));
 
       switch(cmd[0].toLowerCase()) {
         case 'ok':
