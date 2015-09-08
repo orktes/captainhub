@@ -254,5 +254,5 @@ func main() {
 	e.Post("/:owner/:repo", payload)
 
 	// Start server
-	e.Run(":1323")
+	e.Run(":" + os.Getenv("PORT"))
 }
