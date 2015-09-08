@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 
 	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/google/go-github/github"
 )
@@ -29,6 +30,11 @@ func getCaptainConfig(owner string, repo string) (cfg *captainConfig, err error)
 		repo, ".captain.conf", &github.RepositoryContentGetOptions{})
 
 	if err != nil && resp.StatusCode == 404 {
+		if err != nil {
+			fmt.Printf("Could not load .captain.conf: %s %d\n", err.Error(), resp.StatusCode)
+		} else {
+			fmt.Printf("Could not load .captain.conf %d\n", resp.StatusCode)
+		}
 		err = nil
 		fileContent = nil
 	} else if err != nil {
