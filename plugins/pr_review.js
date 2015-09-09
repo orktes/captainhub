@@ -38,23 +38,29 @@ function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
 
       reviewers = _.without(pattern.reviewers, pullRequestUser);
 
+      var reviewerCount = pattern.reviewerCount || 1;
+
       var alreadyReviewing = _.intersection(
         reviewers,
         _.keys(reviewerFiles)
       );
 
       if (alreadyReviewing.length > 0) {
+        var moreReviewerCount = reviewerCount - alreadyReviewing.length;
+        if (moreReviewerCount > 0) {
+          var notReviewing = _.difference(reviewers, alreadyReviewing);
+          for (var i = 0; i < moreReviewerCount && notReviewing.length > 0; i++) {
+            var randomReviewer = notReviewing.splice(Math.floor(Math.random() * notReviewing.length), 1)[0];
+            alreadyReviewing.push(randomReviewer);
+          }
+        }
         reviewers = alreadyReviewing;
       }
 
-      var reviewerCount = pattern.reviewerCount || 1;
-
       for (var i = 0; i < reviewerCount && reviewers.length > 0; i++) {
         var randomReviewer = reviewers.splice(Math.floor(Math.random() * reviewers.length), 1)[0];
-        if (randomReviewer) {
-          reviewerFiles[randomReviewer] = reviewerFiles[randomReviewer] || [];
-          reviewerFiles[randomReviewer].push(file.filename);
-        }
+        reviewerFiles[randomReviewer] = reviewerFiles[randomReviewer] || [];
+        reviewerFiles[randomReviewer].push(file.filename);
       }
 
       if (pattern.owner) {
