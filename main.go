@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/garyburd/redigo/redis"
 	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/google/go-github/github"
@@ -18,7 +19,7 @@ import (
 
 //go:generate go-bindata -prefix=plugins/ -pkg=main plugins/...
 
-var redisClient redis.Conn
+var redisPool *redis.Pool
 
 func matchFilePath(call otto.FunctionCall) otto.Value {
 	pattern := call.Argument(0).String()
@@ -197,6 +198,9 @@ func payload(c *echo.Context) error {
 		})
 
 		vm.Set("saveData", func(call otto.FunctionCall) otto.Value {
+			redisClient := redisPool.Get()
+			defer redisClient.Close()
+
 			key := call.Argument(0).String()
 			data := call.Argument(1).String()
 
@@ -211,6 +215,9 @@ func payload(c *echo.Context) error {
 		})
 
 		vm.Set("loadData", func(call otto.FunctionCall) otto.Value {
+			redisClient := redisPool.Get()
+			defer redisClient.Close()
+
 			key := call.Argument(0).String()
 			storeKey := fmt.Sprintf("%s/%s/%s", owner, repo, key)
 
@@ -237,14 +244,38 @@ func payload(c *echo.Context) error {
 	return nil
 }
 
+func newRedisPool(serverURL, db string) *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 120 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.DialURL(serverURL)
+			if err != nil {
+				return nil, err
+			}
+
+			if _, err := c.Do("SELECT", db); err != nil {
+				c.Close()
+				return nil, err
+			}
+			return c, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			diff := time.Now().Sub(t)
+			// if the client has not been used for 60 seconds ping it before handing it out
+			if diff.Seconds() >= 60 {
+				_, err := c.Do("PING")
+				return err
+			}
+			return nil
+		},
+		Wait: true,
+	}
+}
+
 func main() {
 	// Init redis client
-	var err error
-	redisClient, err = redis.DialURL(os.Getenv("REDISCLOUD_URL"))
-	if err != nil {
-		panic(err)
-	}
-	defer redisClient.Close()
+	redisPool = newRedisPool(os.Getenv("REDISCLOUD_URL"), "0")
 
 	// Echo instance
 	e := echo.New()
