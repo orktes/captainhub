@@ -1,6 +1,4 @@
 function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
-  console.log('Finding reviewers but ignoring ' + pullRequestUser);
-
   var reviewerFiles = {};
   var fileReviewers = {};
 
@@ -13,11 +11,16 @@ function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
 
   _.each(files, function (file) {
     var reviewers = preferredReviewers[file.filename] || [];
-
-    if (reviewers.length === 0) {
+    if (reviewers.length > 0) {
+      _.each(reviewers, function (reviewer) {
+        reviewerFiles[reviewer] = reviewerFiles[reviewer] || [];
+        reviewerFiles[reviewer].push(reviewer);
+      });
+    } else {
       var pattern = _.find(config.patterns, function (fileConf) {
         var patterns = fileConf.pattern;
         var usernames = fileConf.reviewers;
+        var reviewerCount = fileConf.reviewer_count || 1;
 
         var match = _.find(patterns.split(','), function (pattern) {
           //console.log(pattern, file.filename);
@@ -44,12 +47,20 @@ function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
       if (alreadyReviewing.length > 0) {
         reviewers = alreadyReviewing;
       }
+
+      for (var i = 0; i < pattern.reviewerCount && reviewers.length > 0; i++) {
+        var randomReviewer = reviewers.splice(Math.floor(Math.random() * reviewers.length), 1)[0];
+        if (randomReviewer) {
+          reviewerFiles[randomReviewer] = reviewerFiles[randomReviewer] || [];
+          reviewerFiles[randomReviewer].push(file.filename);
+        }
+      }
+
+      if (pattern.owner) {
+        reviewerFiles[pattern.owner] = reviewerFiles[pattern.owner] || [];
+        reviewerFiles[pattern.owner].push(file.filename);
+      }
     }
-
-    var randomReviewer = reviewers[Math.floor(Math.random() * reviewers.length)];
-
-    reviewerFiles[randomReviewer] = reviewerFiles[randomReviewer] || [];
-    reviewerFiles[randomReviewer].push(file.filename);
   }, this);
 
   return reviewerFiles;

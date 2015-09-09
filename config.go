@@ -59,7 +59,7 @@ func getCaptainPlugin(owner string, repo string, pluginName string) (data []byte
 	client := getGithubClient()
 	fileContent, _, _, err := client.Repositories.GetContents(
 		owner,
-		repo, "plugins/"+pluginName+".js", &github.RepositoryContentGetOptions{})
+		repo, "captain_plugins/"+pluginName+".js", &github.RepositoryContentGetOptions{})
 
 	if err != nil {
 		return nil, err
