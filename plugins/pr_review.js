@@ -20,7 +20,6 @@ function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
       var pattern = _.find(config.patterns, function (fileConf) {
         var patterns = fileConf.pattern;
         var usernames = fileConf.reviewers;
-        var reviewerCount = fileConf.reviewer_count || 1;
 
         var match = _.find(patterns.split(','), function (pattern) {
           //console.log(pattern, file.filename);
@@ -48,7 +47,9 @@ function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
         reviewers = alreadyReviewing;
       }
 
-      for (var i = 0; i < pattern.reviewerCount && reviewers.length > 0; i++) {
+      var reviewerCount = pattern.reviewerCount || 1;
+
+      for (var i = 0; i < reviewerCount && reviewers.length > 0; i++) {
         var randomReviewer = reviewers.splice(Math.floor(Math.random() * reviewers.length), 1)[0];
         if (randomReviewer) {
           reviewerFiles[randomReviewer] = reviewerFiles[randomReviewer] || [];
