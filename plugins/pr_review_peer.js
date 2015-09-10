@@ -7,7 +7,7 @@ function pullRequestOpened(eventData) {
   var reviewerCount = config.reviewerCount;
   var prNumber = eventData.number;
 
-  var message = 'Awesome work! Now just sit back and wait for Travis to pass and `' + reviewerCount + '`` others to review your code.\n\n';
+  var message = 'Awesome work! Now just sit back and wait for Travis to pass and `' + reviewerCount + '` others to review your code.\n\n';
 
   message += '\n### Review commands\n';
   message += '- accept: `pr_review OK`\n';
@@ -48,12 +48,19 @@ function pullRequestComment(eventData) {
 
       switch(cmd[0].toLowerCase()) {
         case 'ok':
+
           var prDetails = getPullRequestDetails(prNumber);
+          var pullRequestUser = lc(prDetails.user.login);
           var reviewerCountStr = loadData(prNumber + ':waiting_review_count') || config.reviewerCount.toString();
           var reviewedByStr = loadData(prNumber + ':waiting_reviewed_by') || '[]';
 
           var reviewerCount = JSON.parse(reviewerCountStr);
           var reviewedBy = JSON.parse(reviewedByStr);
+
+          if (senderName === pullRequestUser) {
+            createIssueComment(prNumber, 'Cant review own pull request');
+            return;
+          }
 
           if (reviewedBy.indexOf(senderName) > -1) {
             // already reviewed by this user
