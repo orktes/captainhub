@@ -79,7 +79,7 @@ func pr_review_js() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "pr_review.js", size: 11723, mode: os.FileMode(420), modTime: time.Unix(1441859089, 0)}
+	info := bindata_file_info{name: "pr_review.js", size: 11723, mode: os.FileMode(420), modTime: time.Unix(1441859205, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
