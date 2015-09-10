@@ -79,7 +79,7 @@ func payload(c *echo.Context) error {
 	repo := c.Param("repo")
 
 	data := map[string]interface{}{}
-	if err := json.Unmarshal(body, data); err != nil {
+	if err := json.Unmarshal(body, &data); err != nil {
 		fmt.Printf("%s", err.Error())
 		return err
 	}
