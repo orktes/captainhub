@@ -1,3 +1,7 @@
+function lc(str) {
+  return str && str.toLowerCase ? str.toLowerCase() : str;
+}
+
 function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
   var reviewerFiles = {};
   var fileReviewers = {};
@@ -58,14 +62,15 @@ function getReviewersForFile(files, pullRequestUser, preferredReviewers) {
       }
 
       for (var i = 0; i < reviewerCount && reviewers.length > 0; i++) {
-        var randomReviewer = reviewers.splice(Math.floor(Math.random() * reviewers.length), 1)[0];
+        var randomReviewer = lc(reviewers.splice(Math.floor(Math.random() * reviewers.length), 1)[0]);
         reviewerFiles[randomReviewer] = reviewerFiles[randomReviewer] || [];
         reviewerFiles[randomReviewer].push(file.filename);
       }
 
       if (pattern.owner) {
-        reviewerFiles[pattern.owner] = reviewerFiles[pattern.owner] || [];
-        reviewerFiles[pattern.owner].push(file.filename);
+        var owner = lc(pattern.owner);
+        reviewerFiles[owner] = reviewerFiles[owner] || [];
+        reviewerFiles[owner].push(file.filename);
       }
     }
   }, this);
@@ -82,7 +87,7 @@ function getFileShaMap(files) {
 }
 
 function pullRequestOpened(eventData) {
-  var pullRequestUser = eventData.pull_request.user.login;
+  var pullRequestUser = lc(eventData.pull_request.user.login);
 
   var files = getPullRequestFiles(eventData.number);
   var reviewerFiles = getReviewersForFile(files, pullRequestUser, {});
@@ -121,7 +126,7 @@ function pullRequestOpened(eventData) {
 }
 
 function pullRequestUpdated(eventData) {
-  var pullRequestUser = eventData.pull_request.user.login;
+  var pullRequestUser = lc(eventData.pull_request.user.login);
   var files = getPullRequestFiles(eventData.number);
   var fileShaMapStr = loadData(eventData.number + ':files');
   var oldReviewersStr = loadData(eventData.number + ':waiting_review_from');
@@ -158,6 +163,7 @@ function pullRequestUpdated(eventData) {
 
     // Merge olds files back
     _.each(oldReviewers, function (files, reviewer) {
+      reviewer = lc(reviewer);
       reviewerFiles[reviewer] = reviewerFiles[reviewer] ? _.union(files, reviewerFiles[reviewer]) : files;
     });
 
@@ -178,7 +184,7 @@ function pullRequestUpdated(eventData) {
 
 function pullRequestComment(eventData) {
   var id = eventData.issue.number;
-  var senderName = eventData.sender.login;
+  var senderName = lc(eventData.sender.login);
   var body = eventData.comment.body.trim();
   var cmd;
 
@@ -223,21 +229,23 @@ function pullRequestComment(eventData) {
         break;
         case 'add':
           if (cmd[1]) {
+            var addedUser = lc(cmd[1]);
+            var pattern = cmd[2];
             var newFiles = [];
             var strData = loadData(id + ':waiting_review_from');
             if (strData) {
               try {
                 var reviewerFiles = JSON.parse(strData);
 
-                if (cmd[2]) {
+                if (pattern) {
                   newFiles = _map(_.filter(getPullRequestFiles(id), function (file) {
-                    return matchFilePath(cmd[2], file.filename);
+                    return matchFilePath(pattern, file.filename);
                   }), function (file) {
                     return file.filename;
                   });
                 }
 
-                reviewerFiles[cmd[1]] = _.union(reviewerFiles[cmd[1]] || [], newFiles);
+                reviewerFiles[addedUser] = _.union(reviewerFiles[addedUser] || [], newFiles);
                 saveData(id + ':waiting_review_from', JSON.stringify(reviewerFiles));
                 var prDetails = getPullRequestDetails(id);
                 createStatus(
@@ -247,7 +255,7 @@ function pullRequestComment(eventData) {
                   'Pull request review: ' + _.keys(reviewerFiles).join(', '),
                   'pr_review'
                 );
-                createIssueComment(id, '@' + cmd[1] + ' added');
+                createIssueComment(id, '@' + addedUser + ' added');
               } catch(e) {}
             }
           }
@@ -268,16 +276,18 @@ function pullRequestComment(eventData) {
         */
         case 'change':
           if (cmd[1] && cmd[2]) {
+            var fromUser = lc(cmd[1]);
+            var toUser = lc(cmd[2]);
             var strData = loadData(id + ':waiting_review_from');
             if (strData) {
               try {
                 var reviewerFiles = JSON.parse(strData);
 
-                if (reviewerFiles[cmd[1]]) {
-                  reviewerFiles[cmd[2]] = _.union(reviewerFiles[cmd[2]] || [], reviewerFiles[cmd[1]]);
-                  delete reviewerFiles[cmd[1]];
+                if (reviewerFiles[fromUser]) {
+                  reviewerFiles[toUser] = _.union(reviewerFiles[toUser] || [], reviewerFiles[fromUser]);
+                  delete reviewerFiles[fromUser];
                   saveData(id + ':waiting_review_from', JSON.stringify(reviewerFiles));
-                  createIssueComment(id, '@' + cmd[1] + ' changed to @' + cmd[2]);
+                  createIssueComment(id, '@' + fromUser + ' changed to @' + toUser);
                 }
               } catch(e) {}
             }
