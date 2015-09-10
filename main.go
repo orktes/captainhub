@@ -28,8 +28,6 @@ var redisPool *redis.Pool
 var hookSecret string
 var errMissingSig = echo.NewHTTPError(http.StatusForbidden, "Missing X-Hub-Signature")
 var errInvalidSig = echo.NewHTTPError(http.StatusForbidden, "Invalid X-Hub-Signature")
-var errRepositoryMissing = echo.NewHTTPError(http.StatusForbidden, "No repository in event")
-var errOwnerMissing = echo.NewHTTPError(http.StatusForbidden, "No owner in event")
 
 func matchFilePath(call otto.FunctionCall) otto.Value {
 	pattern := call.Argument(0).String()
