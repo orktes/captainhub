@@ -98,7 +98,7 @@ func payload(c *echo.Context) error {
 	ownerMap, ok := repoMap["owner"].(map[string]interface{})
 	if !ok {
 		fmt.Printf("Owner missing")
-		return errOwnerMissing
+		return nil
 	}
 
 	owner = ownerMap["login"].(string)
