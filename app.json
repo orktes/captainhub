@@ -6,6 +6,9 @@
   "env": {
     "GITHUB_ACCESS_TOKEN": {
       "description": "Github access token"
+    },
+    "GITHUB_HOOK_SECRET": {
+      "description": "Hook secret"
     }
   },
   "addons": [

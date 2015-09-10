@@ -1,8 +1,13 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"time"
 
@@ -20,6 +25,9 @@ import (
 //go:generate go-bindata -prefix=plugins/ -pkg=main plugins/...
 
 var redisPool *redis.Pool
+var hookSecret string
+var errMissingSig = echo.NewHTTPError(http.StatusForbidden, "Missing X-Hub-Signature")
+var errInvalidSig = echo.NewHTTPError(http.StatusForbidden, "Invalid X-Hub-Signature")
 
 func matchFilePath(call otto.FunctionCall) otto.Value {
 	pattern := call.Argument(0).String()
@@ -44,13 +52,34 @@ func getGithubClient() *github.Client {
 // Handler
 func payload(c *echo.Context) error {
 	r := c.Request()
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+
+	if hookSecret != "" {
+		sig := r.Header.Get("X-Hub-Signature")
+		if sig == "" {
+			return errMissingSig
+		}
+
+		mac := hmac.New(sha1.New, []byte(hookSecret))
+		mac.Write(body)
+		expectedMAC := mac.Sum(nil)
+		expectedSig := "sha1=" + hex.EncodeToString(expectedMAC)
+		if !hmac.Equal([]byte(expectedSig), []byte(sig)) {
+			return errInvalidSig
+		}
+	}
+
 	eventType := r.Header.Get("X-Github-Event")
 
 	owner := c.Param("owner")
 	repo := c.Param("repo")
 
 	data := map[string]interface{}{}
-	if err := c.Bind(&data); err != nil {
+	if err := json.Unmarshal(body, data); err != nil {
 		fmt.Printf("%s", err.Error())
 		return err
 	}
@@ -274,6 +303,9 @@ func newRedisPool(serverURL, db string) *redis.Pool {
 }
 
 func main() {
+	// Init hook secret
+	hookSecret = os.Getenv("GITHUB_HOOK_SECRET")
+
 	// Init redis client
 	redisPool = newRedisPool(os.Getenv("REDISCLOUD_URL"), "0")
 
