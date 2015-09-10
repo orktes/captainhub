@@ -286,6 +286,14 @@ function pullRequestComment(eventData) {
                 if (reviewerFiles[fromUser]) {
                   reviewerFiles[toUser] = _.union(reviewerFiles[toUser] || [], reviewerFiles[fromUser]);
                   delete reviewerFiles[fromUser];
+                  var prDetails = getPullRequestDetails(id);
+                  createStatus(
+                    prDetails.head.sha,
+                    'pending',
+                    prDetails.url,
+                    'Pull request review: ' + _.keys(reviewerFiles).join(', '),
+                    'pr_review'
+                  );
                   saveData(id + ':waiting_review_from', JSON.stringify(reviewerFiles));
                   createIssueComment(id, '@' + fromUser + ' changed to @' + toUser);
                 }
