@@ -91,13 +91,15 @@ func payload(c *echo.Context) error {
 
 	repoMap, ok := repository.(map[string]interface{})
 	if !ok {
-		return errRepositoryMissing
+		fmt.Printf("Repository missing")
+		return nil
 	}
 
 	repo = repoMap["name"].(string)
 
 	ownerMap, ok := repoMap["owner"].(map[string]interface{})
 	if !ok {
+		fmt.Printf("Owner missing")
 		return errOwnerMissing
 	}
 
