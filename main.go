@@ -28,6 +28,8 @@ var redisPool *redis.Pool
 var hookSecret string
 var errMissingSig = echo.NewHTTPError(http.StatusForbidden, "Missing X-Hub-Signature")
 var errInvalidSig = echo.NewHTTPError(http.StatusForbidden, "Invalid X-Hub-Signature")
+var errRepositoryMissing = echo.NewHTTPError(http.StatusForbidden, "No repository in event")
+var errOwnerMissing = echo.NewHTTPError(http.StatusForbidden, "No owner in event")
 
 func matchFilePath(call otto.FunctionCall) otto.Value {
 	pattern := call.Argument(0).String()
@@ -51,6 +53,10 @@ func getGithubClient() *github.Client {
 
 // Handler
 func payload(c *echo.Context) error {
+
+	var owner string
+	var repo string
+
 	r := c.Request()
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -75,14 +81,27 @@ func payload(c *echo.Context) error {
 
 	eventType := r.Header.Get("X-Github-Event")
 
-	owner := c.Param("owner")
-	repo := c.Param("repo")
-
 	data := map[string]interface{}{}
 	if err := json.Unmarshal(body, &data); err != nil {
 		fmt.Printf("%s", err.Error())
 		return err
 	}
+
+	repository := data["repository"]
+
+	repoMap, ok := repository.(map[string]interface{})
+	if !ok {
+		return errRepositoryMissing
+	}
+
+	repo = repoMap["name"].(string)
+
+	ownerMap, ok := repoMap["owner"].(map[string]interface{})
+	if !ok {
+		return errOwnerMissing
+	}
+
+	owner = ownerMap["login"].(string)
 
 	fmt.Printf("Event: %s, Owner: %s, Repo %s\n", eventType, owner, repo)
 
@@ -317,7 +336,7 @@ func main() {
 	e.Use(mw.Recover())
 
 	// Routes
-	e.Post("/:owner/:repo", payload)
+	e.Post("/payload", payload)
 
 	// Start server
 	e.Run(":" + os.Getenv("PORT"))
