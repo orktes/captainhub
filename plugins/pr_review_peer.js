@@ -119,20 +119,6 @@ function pullRequestComment(eventData) {
   });
 }
 
-function pullRequestUpdated(eventData) {
-  var prNumber = eventData.number;
-  var prDetails = getPullRequestDetails(prNumber);
-
-  createStatus(
-    eventData.pull_request.head.sha,
-    'pending',
-    eventData.pull_request.url,
-    'Pull request review waiting ' + reviewerCount + ' peers',
-    'pr_review'
-  );
-
-}
-
 // Process hook data
 if (eventType === 'pull_request' && eventData.action === 'opened') {
   pullRequestOpened(eventData);
