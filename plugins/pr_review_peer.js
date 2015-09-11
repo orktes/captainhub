@@ -2,17 +2,21 @@ function lc(str) {
   return str && str.toLowerCase ? str.toLowerCase() : str;
 }
 
-function pullRequestOpened(eventData) {
+function pullRequestOpened(eventData, update) {
   var pullRequestUser = lc(eventData.pull_request.user.login);
   var reviewerCount = config.reviewerCount;
   var prNumber = eventData.number;
+  var message;
 
-  var message = 'Awesome work! Now just sit back and wait for Travis to pass and `' + reviewerCount + '` others to review your code.\n\n';
+  if (!update) {
+    message = 'Awesome work! Now just sit back and wait for Travis to pass and `' + reviewerCount + '` others to review your code.\n\n';
 
-  message += '\n### Review commands\n';
-  message += '- accept: `pr_review OK`\n';
-  message += '- print status: `pr_review status`\n';
-
+    message += '\n### Review commands\n';
+    message += '- accept: `pr_review OK`\n';
+    message += '- print status: `pr_review status`\n';
+  } else {
+    message += 'Some of the files were updated! `' + reviewerCount + '` others need to review the changes.';
+  }
 
   createIssueComment(prNumber, message);
   createStatus(
@@ -115,10 +119,25 @@ function pullRequestComment(eventData) {
   });
 }
 
+function pullRequestUpdated(eventData) {
+  var prNumber = eventData.number;
+  var prDetails = getPullRequestDetails(prNumber);
+
+  createStatus(
+    eventData.pull_request.head.sha,
+    'pending',
+    eventData.pull_request.url,
+    'Pull request review waiting ' + reviewerCount + ' peers',
+    'pr_review'
+  );
+
+}
 
 // Process hook data
 if (eventType === 'pull_request' && eventData.action === 'opened') {
   pullRequestOpened(eventData);
 } else if (eventType === 'issue_comment' && eventData.action === 'created' && eventData.issue.pull_request) {
   pullRequestComment(eventData);
+} else if (eventType === 'pull_request' && eventData.action === 'synchronize') {
+  pullRequestOpened(eventData, true);
 }
