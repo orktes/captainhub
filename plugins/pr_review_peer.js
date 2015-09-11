@@ -114,6 +114,10 @@ function pullRequestComment(eventData) {
 
           createIssueComment(prNumber, message);
         break;
+        case 'reopen':
+          var fakeEvent = {number: prNumber, pull_request: getPullRequestDetails(prNumber)};
+          pullRequestOpened(fakeEvent);
+        break;
       }
     }
   });
