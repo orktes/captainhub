@@ -15,7 +15,7 @@ function pullRequestOpened(eventData, update) {
     message += '- accept: `pr_review OK`\n';
     message += '- print status: `pr_review status`\n';
   } else {
-    message += 'Some of the files were updated! `' + reviewerCount + '` others need to review the changes.';
+    message = 'Some of the files were updated! `' + reviewerCount + '` others need to review the changes.';
   }
 
   createIssueComment(prNumber, message);
