@@ -18,7 +18,9 @@ function pullRequestOpened(eventData, update) {
     message = 'Some of the files were updated! `' + reviewerCount + '` others need to review the changes.';
   }
 
-  createIssueComment(prNumber, message);
+  if (!config.silent) {
+    createIssueComment(prNumber, message);
+  }
   createStatus(
     eventData.pull_request.head.sha,
     'pending',
@@ -91,7 +93,9 @@ function pullRequestComment(eventData) {
               'Pull request review done',
               'pr_review'
             );
-            createIssueComment(prNumber, 'Review completed!');
+            if (!config.silent) {
+              createIssueComment(prNumber, 'Review completed!');
+            }
           }
 
           saveData(prNumber + ':waiting_review_count', JSON.stringify(reviewerCount));
