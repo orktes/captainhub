@@ -189,7 +189,7 @@ function pullRequestComment(eventData) {
   var cmd;
 
   _.each(body.split('\n'), function (message) {
-    if (message.indexOf('pr_review') === 0) {
+    if (message.substr(0, 'pr_review'.length).toLowerCase() === 'pr_review') {
       cmd = _.filter(
         _.map(message.substring(10).split(' '), function (part) {
           return part.trim().replace(/^@/, '');
