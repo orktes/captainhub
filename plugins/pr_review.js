@@ -189,6 +189,7 @@ function pullRequestComment(eventData) {
   var cmd;
 
   function aliasUsername (username) {
+    console.log('Checking alias for ' + username);
     return username === 'me' ? senderName : username;
   }
 
