@@ -188,6 +188,10 @@ function pullRequestComment(eventData) {
   var body = eventData.comment.body.trim();
   var cmd;
 
+  function aliasUsername (username) {
+    return username === 'me' ? senderName : username;
+  }
+
   _.each(body.split('\n'), function (message) {
     if (message.indexOf('pr_review') === 0) {
       cmd = _.filter(
@@ -229,7 +233,7 @@ function pullRequestComment(eventData) {
         break;
         case 'add':
           if (cmd[1]) {
-            var addedUser = lc(cmd[1]);
+            var addedUser = aliasUsername(lc(cmd[1]));
             var pattern = cmd[2];
             var newFiles = [];
             var strData = loadData(id + ':waiting_review_from');
@@ -276,8 +280,8 @@ function pullRequestComment(eventData) {
         */
         case 'change':
           if (cmd[1] && cmd[2]) {
-            var fromUser = lc(cmd[1]);
-            var toUser = lc(cmd[2]);
+            var fromUser = aliasUsername(lc(cmd[1]));
+            var toUser = aliasUsername(lc(cmd[2]));
             var strData = loadData(id + ':waiting_review_from');
             if (strData) {
               try {
