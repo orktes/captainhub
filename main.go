@@ -101,7 +101,11 @@ func payload(c *echo.Context) error {
 		return nil
 	}
 
-	owner = ownerMap["login"].(string)
+	if _, ok := ownerMap["login"]; ok {
+		owner = ownerMap["login"].(string)
+	} else if _, ok := ownerMap["name"]; ok {
+		owner = ownerMap["name"].(string)
+	}
 
 	fmt.Printf("Event: %s, Owner: %s, Repo %s\n", eventType, owner, repo)
 
@@ -123,10 +127,81 @@ func payload(c *echo.Context) error {
 		}
 
 		vm := otto.New()
+		vm.Run(`
+			var global = {};
+			_moduleCache = {};
+			function require(moduleName) {
+				if (!_moduleCache[moduleName]) {
+					_require(moduleName);
+				}
+
+				return _moduleCache[moduleName];
+			}
+		`)
 		vm.Set("eventType", eventType)
 		vm.Set("eventData", data)
 		vm.Set("config", plugin.Config)
 		vm.Set("matchFilePath", matchFilePath)
+		vm.Set("_require", func(call otto.FunctionCall) otto.Value {
+			moduleFilename, err := call.Argument(0).ToString()
+			if err != nil {
+				panic(err)
+			}
+
+			content, err := getCaptainPlugin(owner, repo, moduleFilename)
+			if err != nil {
+				panic(err)
+			}
+			script := `
+				(function (_moduleCache, global) {
+				  var module = {exports: {}};
+					(function (require, module, exports, undefined) {
+						` + string(content) + `
+					})(require, module, module.exports);
+					_moduleCache["` + moduleFilename + `"] = module.exports;
+				})(_moduleCache, global);
+			`
+			_, err = vm.Run(script)
+			if err != nil {
+				fmt.Printf("Error evaluating %s %s %s\n", moduleFilename, script, err.Error())
+			}
+
+			return otto.Value{}
+		})
+
+		vm.Set("print", func(call otto.FunctionCall) otto.Value {
+			text, err := call.Argument(0).ToString()
+			if err != nil {
+				panic(err)
+			}
+
+			println(text)
+			return otto.Value{}
+		})
+
+		vm.Set("getPullRequestFileContent", func(call otto.FunctionCall) otto.Value {
+			prNumber, err := call.Argument(0).ToInteger()
+			if err != nil {
+				panic(err)
+			}
+
+			fileName, err := call.Argument(1).ToString()
+			if err != nil {
+				panic(err)
+			}
+
+			content, err := readPullRequestFileContent(owner, repo, int(prNumber), fileName)
+			if err != nil {
+				panic(err)
+			}
+
+			ottoValue, err := otto.ToValue(string(content))
+			if err != nil {
+				panic(err)
+			}
+
+			return ottoValue
+		})
 
 		vm.Set("getPullRequestDetails", func(call otto.FunctionCall) otto.Value {
 			prNumber, err := call.Argument(0).ToInteger()
@@ -282,9 +357,14 @@ func payload(c *echo.Context) error {
 			return ottoValue
 		})
 
-		_, err = vm.Run(string(pluginData))
+		_, err = vm.Run(`
+			var module = {exports: {}};
+				(function (require, module, exports, global, undefined) {
+					` + string(pluginData) + `
+				})(require, module, module.exports, global);
+			`)
 		if err != nil {
-			fmt.Printf("%s\n", err.Error())
+			fmt.Printf("plugin eval error: %s %s\n", err.Error(), pluginData)
 			return err
 		}
 	}
@@ -333,7 +413,7 @@ func main() {
 
 	// Middleware
 	e.Use(mw.Logger())
-	e.Use(mw.Recover())
+	//e.Use(mw.Recover())
 
 	// Routes
 	e.Post("/payload", payload)

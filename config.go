@@ -66,7 +66,7 @@ func getCaptainPlugin(owner string, repo string, pluginName string) (data []byte
 	}
 
 	if err == nil && fileContent != nil {
-		data = []byte(*fileContent.Content)
+		data, _ = base64.StdEncoding.DecodeString(*fileContent.Content)
 	}
 
 	return

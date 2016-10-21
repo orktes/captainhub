@@ -1,6 +1,10 @@
 package main
 
-import "github.com/orktes/captainhub/Godeps/_workspace/src/github.com/google/go-github/github"
+import (
+	"encoding/base64"
+
+	"github.com/orktes/captainhub/Godeps/_workspace/src/github.com/google/go-github/github"
+)
 
 func createPullRequestComment(owner string, repo string, prNumber int, body string) (err error) {
 	client := getGithubClient()
@@ -35,6 +39,30 @@ func createIssueComment(owner string, repo string, issueNumber int, body string)
 func getPullRequestDetails(owner string, repo string, prNumber int) (pullRequest *github.PullRequest, err error) {
 	client := getGithubClient()
 	pullRequest, _, err = client.PullRequests.Get(owner, repo, prNumber)
+	return
+}
+
+func readPullRequestFileContent(owner string, repo string, prNumber int, fileName string) (str []byte, err error) {
+	client := getGithubClient()
+	var pullRequest *github.PullRequest
+	pullRequest, _, err = client.PullRequests.Get(owner, repo, prNumber)
+	if err != nil {
+		return
+	}
+	content, _, _, err := client.Repositories.GetContents(
+		owner,
+		repo, fileName, &github.RepositoryContentGetOptions{
+			Ref: *pullRequest.Head.Ref,
+		})
+
+	if err != nil {
+		return
+	}
+
+	if err == nil && content != nil {
+		str, _ = base64.StdEncoding.DecodeString(*content.Content)
+	}
+
 	return
 }
 
