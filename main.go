@@ -413,7 +413,7 @@ func main() {
 
 	// Middleware
 	e.Use(mw.Logger())
-	//e.Use(mw.Recover())
+	e.Use(mw.Recover())
 
 	// Routes
 	e.Post("/payload", payload)
